@@ -11,16 +11,25 @@ sess = chs.Session("wimbledon.chdb")
 
 
 with st.sidebar:
+  st.write("Choose a match")
+  gender_filter = st.selectbox(
+      "Matches to include",
+      options=["Both", "Men", "Women"]
+  )
   match = sess.query("""
   select match, matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name AS p1Name, 
-        matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name
+        matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name,
+        if(matches.json.players.p1.atp_id IS NOT NULL, 'Men', 'Women') AS event
   FROM matches
   """, "DataFrame")
+  if gender_filter != "Both":
+    match = match[match["event"] == gender_filter]
+    
   match['label'] = match['p1Name'] + " vs " + match['p2Name']
   label_to_match = dict(zip(match['label'], match['match']))
 
   selected_label = st.selectbox(
-      "Which match would you like to analyze?",
+      "Select match",
       options=list(label_to_match.keys())
   )
   selected_match_id = label_to_match[selected_label]
