@@ -21,6 +21,7 @@ with st.sidebar:
         matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name,
         if(matches.json.players.p1.atp_id IS NOT NULL, 'Men', 'Women') AS event
   FROM matches
+  ORDER BY matches.json.players.p1.atp_id::String
   """, "DataFrame")
   if gender_filter != "Both":
     match = match[match["event"] == gender_filter]
@@ -33,6 +34,9 @@ with st.sidebar:
       options=list(label_to_match.keys())
   )
   selected_match_id = label_to_match[selected_label]
+
+  st.write("----")
+  st.write("Powered by [chDB](https://clickhouse.com/docs/chdb) and [Streamlit](https://streamlit.io/).")
 
 df = sess.query(f"""
 SELECT P1GamesWon || '-' || P2GamesWon AS score,
