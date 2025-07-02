@@ -1,4 +1,4 @@
-ATTACH TABLE _ UUID '84c0c51f-7b65-482b-a0ca-a978a2e301e2'
+ATTACH TABLE _ UUID '2a0048c3-4b02-4448-a5b5-01eea6ef6a9d'
 (
     `json` JSON,
     `match` String

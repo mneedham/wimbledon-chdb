@@ -1,4 +1,4 @@
-ATTACH TABLE _ UUID 'be210ba9-5bbe-4f8a-b55b-2eacf6e31783'
+ATTACH TABLE _ UUID '9ec141a3-8ac0-4107-81c8-fa596049926d'
 (
     `ElapsedTime` Nullable(String),
     `MatchID` Nullable(String),
