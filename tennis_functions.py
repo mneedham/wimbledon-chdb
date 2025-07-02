@@ -84,6 +84,6 @@ def init_functions(sess):
         myGameScore = '6' AND theirGameScore='6', pointsToWinTiebreak(myPointScore::UInt32, theirPointScore::UInt32), 
         pointsToWinGame(myPointScore, theirPointScore)
         ),
-        72
+        if(bestOf5, 72, 48)
         );
     """)

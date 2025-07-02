@@ -20,6 +20,8 @@ init_functions(sess)
   (True, {"whoAmI": "1", "mySetScore": "'2'", "theirSetScore": "'2'", "myGameScore": "'6'", "theirGameScore": "'6'", "myPointScore": "'7'", "theirPointScore": "'4'"}, 3),
   (True, {"whoAmI": "1", "mySetScore": "'2'", "theirSetScore": "'2'", "myGameScore": "'6'", "theirGameScore": "'6'", "myPointScore": "'9'", "theirPointScore": "'9'"}, 2),
   (True, {"whoAmI": "2", "mySetScore": "'2'", "theirSetScore": "'2'", "myGameScore": "'6'", "theirGameScore": "'6'", "myPointScore": "'9'", "theirPointScore": "'9'"}, 2),
+  (True, {"whoAmI": "2", "mySetScore": "'0'", "theirSetScore": "'2'", "myGameScore": "'0'", "theirGameScore": "'5'"}, 76),
+  (True, {"whoAmI": "1", "MatchWinner": "'2'"}, 72),
 
   (False, {"whoAmI": "1"}, 48),
   (False, {"whoAmI": "1", "SetWinner": "'1'", "GameWinner": "'1'", "mySetScore": "'1'"}, 24),  
@@ -27,6 +29,7 @@ init_functions(sess)
   (False, {"whoAmI": "1", "mySetScore": "'1'", "theirSetScore": "'1'", "myGameScore": "'6'", "theirGameScore": "'6'", "myPointScore": "'7'", "theirPointScore": "'4'"}, 3),
   (False, {"whoAmI": "2", "mySetScore": "'1'", "theirSetScore": "'1'", "myGameScore": "'6'", "theirGameScore": "'6'", "myPointScore": "'9'", "theirPointScore": "'9'"}, 2),
   (False, {"whoAmI": "1", "GameWinner": "'1'", "mySetScore": "'1'", "theirSetScore": "'1'", "myGameScore": "'6'", "theirGameScore": "'6'"}, 10),
+  (False, {"whoAmI": "1", "MatchWinner": "'2'"}, 48),
   
 ])
 def test_points_to_win_match(bestof5, data,expected):
