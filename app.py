@@ -36,53 +36,61 @@ WHERE match = '{selected_match_id}' AND (SetWinner <> '0' OR MatchWinner <> '0')
 
 st.header(f"{df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
 
+points_df = sess.query(f"""
+WITH
+  pointsToWinMatch(
+    matches.json.players.p1.atp_id IS NOT NULL, MatchWinner, GameWinner, SetWinner, '1', P1SetsWon, P2SetsWon, P1GamesWon, P2GamesWon, P1Score, P2Score
+  ) AS p1PointsToWin,
+  pointsToWinMatch(
+    matches.json.players.p1.atp_id IS NOT NULL, MatchWinner, GameWinner, SetWinner, '2', P2SetsWon, P1SetsWon, P2GamesWon, P1GamesWon, P2Score, P1Score
+  ) AS p2PointsToWin
+select matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name AS p1Name, 
+      p1PointsToWin, p2PointsToWin,
+      matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name,
+      P1SetsWon || '-' || P2SetsWon || ' ' || P1GamesWon || '-' || P2GamesWon || ' (' || P1Score || '-' || P2Score || ')'  AS score
+FROM points
+JOIN matches ON matches.match = points.match
+WHERE match = '{selected_match_id}';
+""", "DataFrame")
+
+
 left, right = st.columns([1,4])
 
 with left:
   with st.spinner("Loading...", show_time=True):
-    st.write("🆚 " + ", ".join(df.score.values))
+    score = ", ".join(df.score.values)    
 
     df = sess.query(f"""
-    SELECT ElapsedTime, SetNo, PointNumber
+    SELECT ElapsedTime, SetNo, PointNumber,
+           if(
+             MatchWinner = '1', 
+             matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name, 
+             matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name
+          ) AS winner, MatchWinner
     FROM points
     JOIN matches ON matches.match = points.match
-    WHERE match = '{selected_match_id}'
-    ORDER BY ElapsedTime DESC
-    LIMIT 1
+    WHERE match = '{selected_match_id}' AND MatchWinner <> '0'
     """, "DataFrame")
+    winner_id = df.MatchWinner.iloc[0]
+    st.write("🥇 " + df.winner.iloc[0])
+    st.write("🆚 " + score )
     st.write(f"⏰ {df["ElapsedTime"].iloc[0]}")
+    st.write("🎾 " + df["PointNumber"].iloc[0] + " total points")
+    st.write("⚠️ " + (str(points_df.p2PointsToWin.min()) if winner_id == '1' else str(points_df.p1PointsToWin.min())) + " points from losing")
 
 with right:
   with st.spinner("Loading...", show_time=True):
-    df = sess.query(f"""
-    WITH
-      pointsToWinMatch(
-        matches.json.players.p1.atp_id IS NOT NULL, MatchWinner, GameWinner, SetWinner, '1', P1SetsWon, P2SetsWon, P1GamesWon, P2GamesWon, P1Score, P2Score
-      ) AS p1PointsToWin,
-      pointsToWinMatch(
-        matches.json.players.p1.atp_id IS NOT NULL, MatchWinner, GameWinner, SetWinner, '2', P2SetsWon, P1SetsWon, P2GamesWon, P1GamesWon, P2Score, P1Score
-      ) AS p2PointsToWin
-    select matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name AS p1Name, 
-          p1PointsToWin, p2PointsToWin,
-          matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name,
-          P1SetsWon || '-' || P2SetsWon || ' ' || P1GamesWon || '-' || P2GamesWon || ' (' || P1Score || '-' || P2Score || ')'  AS score
-    FROM points
-    JOIN matches ON matches.match = points.match
-    WHERE match = '{selected_match_id}';
-    """, "DataFrame")
+    points_df = points_df.reset_index()
+    points_df.rename(columns={'index': 'Step'}, inplace=True)
 
-
-    df = df.reset_index()
-    df.rename(columns={'index': 'Step'}, inplace=True)
-
-    df_long = df.melt(id_vars=['Step', 'score'], 
+    df_long = points_df.melt(id_vars=['Step', 'score'], 
                       value_vars=['p1PointsToWin', 'p2PointsToWin'],
                       var_name='PlayerType', 
                       value_name='PointsToWin')
 
     player_name_map = {
-        'p1PointsToWin': df['p1Name'].iloc[0],
-        'p2PointsToWin': df['p2Name'].iloc[0]
+        'p1PointsToWin': points_df['p1Name'].iloc[0],
+        'p2PointsToWin': points_df['p2Name'].iloc[0]
     }
     df_long['Player'] = df_long['PlayerType'].map(player_name_map)
 
@@ -116,3 +124,5 @@ with right:
     fig.update_traces(line=dict(width=2))  # thicker lines for visibility
 
     st.plotly_chart(fig, use_container_width=True)
+
+
