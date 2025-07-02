@@ -1,16 +1,9 @@
 from chdb import session as chs
 import pytest
-
+from tennis_functions import init_functions
 
 sess = chs.Session("wimbledon.chdb")
-
-sess.query("""
-CREATE OR REPLACE FUNCTION pointsToWinOtherSetsBO5 AS (setScore, assumeWinSet) -> (3 - (setScore+assumeWinSet)) * 24;
-""")
-
-sess.query("""
-CREATE OR REPLACE FUNCTION pointsToWinOtherSetsBO3 AS (setScore, assumeWinSet) -> (2 - (setScore+assumeWinSet)) * 24;
-""")
+init_functions(sess)
 
 @pytest.mark.parametrize("set_score,assume_win_set,expected", [
   (0, False, 72),
