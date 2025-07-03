@@ -86,6 +86,14 @@ with left:
     st.write("🎾 " + str(df["PointNumber"].iloc[0]) + " total points")
     st.write("⚠️ " + (str(points_df.p2PointsToWin.min()) if winner_id == '1' else str(points_df.p1PointsToWin.min())) + " points from losing")
 
+    how_much_winning = (
+      points_df[points_df.p1PointsToWin < points_df.p2PointsToWin].shape[0] / points_df.shape[0] 
+      if winner_id == '1' 
+      else points_df[points_df.p2PointsToWin < points_df.p1PointsToWin].shape[0] / points_df.shape[0]
+    )
+    st.write("📈 " + str(f"{how_much_winning*100:.2f}") + " % time ahead") 
+
+
 with right:
   with st.spinner("Loading...", show_time=True):
     df_long = points_df.melt(id_vars=['PointNumber', 'score'], 
