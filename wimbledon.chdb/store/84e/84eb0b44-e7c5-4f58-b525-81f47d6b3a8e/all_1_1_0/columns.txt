@@ -1,0 +1,10 @@
+columns format version: 1
+8 columns:
+`MatchWinner` String
+`SetWinner` String
+`GameWinner` String
+`p1` Tuple(setsWon String, gamesWon String, score String)
+`p2` Tuple(setsWon String, gamesWon String, score String)
+`ElapsedTime` String
+`PointNumber` String
+`match` String

@@ -1,10 +1,14 @@
-ATTACH TABLE _ UUID '84eb0b44-e7c5-4f58-b525-81f47d6b3a8e'
+ATTACH TABLE _ UUID 'bb6f8587-cd60-4655-8e81-2690c3773e79'
 (
     `MatchWinner` String,
     `SetWinner` String,
     `GameWinner` String,
-    `p1` Tuple(setsWon String, gamesWon String, score String),
-    `p2` Tuple(setsWon String, gamesWon String, score String),
+    `P1SetsWon` String,
+    `P2SetsWon` String,
+    `P1GamesWon` String,
+    `P2GamesWon` String,
+    `P1Score` String,
+    `P2Score` String,
     `ElapsedTime` String,
     `PointNumber` String,
     `match` String

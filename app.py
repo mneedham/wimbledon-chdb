@@ -37,8 +37,7 @@ with st.sidebar:
   st.write("Powered by [chDB](https://clickhouse.com/docs/chdb) and [Streamlit](https://streamlit.io/).")
 
 df = sess.query(f"""
-SELECT P1GamesWon || '-' || P2GamesWon AS score,
-      p1Name, p2Name
+SELECT p1.gamesWon || '-' || p2.gamesWon AS score, p1Name, p2Name
 FROM points
 JOIN matches ON matches.match = points.match
 WHERE match = '{selected_match_id}' AND (SetWinner <> '0' OR MatchWinner <> '0')
@@ -49,13 +48,13 @@ st.header(f"{df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
 points_df = sess.query(f"""
 WITH
   pointsToWinMatch(
-    matches.event = 'Men', MatchWinner, GameWinner, SetWinner, '1', P1SetsWon, P2SetsWon, P1GamesWon, P2GamesWon, P1Score, P2Score
+    matches.event = 'Men', MatchWinner, GameWinner, SetWinner, '1', p1.setsWon, p2.setsWon, p1.gamesWon, p2.gamesWon, p1.score, p2.score
   ) AS p1PointsToWin,
   pointsToWinMatch(
-    matches.event = 'Men', MatchWinner, GameWinner, SetWinner, '2', P2SetsWon, P1SetsWon, P2GamesWon, P1GamesWon, P2Score, P1Score
+    matches.event = 'Men', MatchWinner, GameWinner, SetWinner, '2', p2.setsWon, p1.setsWon, p2.gamesWon, p1.gamesWon, p2.score, p1.score
   ) AS p2PointsToWin
 select p1Name, p1PointsToWin, p2PointsToWin, p2Name,
-      P1SetsWon || '-' || P2SetsWon || ' ' || P1GamesWon || '-' || P2GamesWon || ' (' || P1Score || '-' || P2Score || ')'  AS score
+      p1.setsWon || '-' || p2.setsWon || ' ' || p1.gamesWon || '-' || p2.gamesWon || ' (' || p1.score || '-' || p2.score || ')'  AS score
 FROM points
 JOIN matches ON matches.match = points.match
 WHERE match = '{selected_match_id}';
