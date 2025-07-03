@@ -86,11 +86,14 @@ with left:
     st.write("🎾 " + str(df["PointNumber"].iloc[0]) + " total points")
     st.write("⚠️ " + (str(points_df.p2PointsToWin.min()) if winner_id == '1' else str(points_df.p1PointsToWin.min())) + " points from losing")
 
+    points_in_play = points_df[points_df.PointNumber >= 1]
+
     how_much_winning = (
-      points_df[points_df.p1PointsToWin < points_df.p2PointsToWin].shape[0] / points_df.shape[0] 
+      points_in_play[points_in_play.p1PointsToWin < points_in_play.p2PointsToWin].shape[0] / points_in_play.shape[0] 
       if winner_id == '1' 
-      else points_df[points_df.p2PointsToWin < points_df.p1PointsToWin].shape[0] / points_df.shape[0]
+      else points_in_play[points_in_play.p2PointsToWin < points_in_play.p1PointsToWin].shape[0] / points_in_play.shape[0]
     )
+  
     st.write("📈 " + str(f"{how_much_winning*100:.2f}") + " % time ahead") 
 
 
