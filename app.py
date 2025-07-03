@@ -82,7 +82,7 @@ with left:
     winner_id = df.MatchWinner.iloc[0]
     st.write("🥇 " + df.winner.iloc[0])
     st.write("🆚 " + score )
-    st.write(f"⏰ {df["ElapsedTime"].iloc[0]}")
+    st.write(f"⏰ {str(df["ElapsedTime"].iloc[0])}")
     st.write("🎾 " + str(df["PointNumber"].iloc[0]) + " total points")
     st.write("⚠️ " + (str(points_df.p2PointsToWin.min()) if winner_id == '1' else str(points_df.p1PointsToWin.min())) + " points from losing")
 
