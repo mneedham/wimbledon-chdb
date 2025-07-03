@@ -1,4 +1,4 @@
-ATTACH TABLE _ UUID 'a82fa35c-5850-47d6-b6a4-81433a5ce653'
+ATTACH TABLE _ UUID '0e52503b-e95b-4bfc-9df2-3ea5dfc29f0e'
 (
     `p1Name` Nullable(String),
     `p2Name` Nullable(String),

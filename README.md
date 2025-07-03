@@ -17,3 +17,5 @@ And then run:
 uv run --with chdb --with plotly --with streamlit \
 streamlit run app.py  --server.headless True
 ```
+
+Then navigate to http://localhost:8501
