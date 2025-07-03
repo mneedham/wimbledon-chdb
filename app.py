@@ -69,7 +69,7 @@ with left:
     score = ", ".join(df.score.values)    
 
     df = sess.query(f"""
-    SELECT ElapsedTime, SetNo, PointNumber,
+    SELECT ElapsedTime, PointNumber,
            if(
              MatchWinner = '1', 
              matches.p1Name, 
