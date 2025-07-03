@@ -17,11 +17,9 @@ with st.sidebar:
       options=["Both", "Men", "Women"]
   )
   match = sess.query("""
-  select match, matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name AS p1Name, 
-        matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name,
-        if(matches.json.players.p1.atp_id IS NOT NULL, 'Men', 'Women') AS event
+  select match, p1Name, p2Name, event
   FROM matches
-  ORDER BY matches.json.players.p1.atp_id::String
+  ORDER BY event
   """, "DataFrame")
   if gender_filter != "Both":
     match = match[match["event"] == gender_filter]
@@ -40,8 +38,7 @@ with st.sidebar:
 
 df = sess.query(f"""
 SELECT P1GamesWon || '-' || P2GamesWon AS score,
-      matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name AS p1Name, 
-        matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name
+      p1Name, p2Name
 FROM points
 JOIN matches ON matches.match = points.match
 WHERE match = '{selected_match_id}' AND (SetWinner <> '0' OR MatchWinner <> '0')
@@ -52,14 +49,12 @@ st.header(f"{df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
 points_df = sess.query(f"""
 WITH
   pointsToWinMatch(
-    matches.json.players.p1.atp_id IS NOT NULL, MatchWinner, GameWinner, SetWinner, '1', P1SetsWon, P2SetsWon, P1GamesWon, P2GamesWon, P1Score, P2Score
+    matches.event = 'Men', MatchWinner, GameWinner, SetWinner, '1', P1SetsWon, P2SetsWon, P1GamesWon, P2GamesWon, P1Score, P2Score
   ) AS p1PointsToWin,
   pointsToWinMatch(
-    matches.json.players.p1.atp_id IS NOT NULL, MatchWinner, GameWinner, SetWinner, '2', P2SetsWon, P1SetsWon, P2GamesWon, P1GamesWon, P2Score, P1Score
+    matches.event = 'Men', MatchWinner, GameWinner, SetWinner, '2', P2SetsWon, P1SetsWon, P2GamesWon, P1GamesWon, P2Score, P1Score
   ) AS p2PointsToWin
-select matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name AS p1Name, 
-      p1PointsToWin, p2PointsToWin,
-      matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name AS p2Name,
+select p1Name, p1PointsToWin, p2PointsToWin, p2Name,
       P1SetsWon || '-' || P2SetsWon || ' ' || P1GamesWon || '-' || P2GamesWon || ' (' || P1Score || '-' || P2Score || ')'  AS score
 FROM points
 JOIN matches ON matches.match = points.match
@@ -77,8 +72,8 @@ with left:
     SELECT ElapsedTime, SetNo, PointNumber,
            if(
              MatchWinner = '1', 
-             matches.json.players.p1.first_name || ' ' || matches.json.players.p1.last_name, 
-             matches.json.players.p2.first_name || ' ' || matches.json.players.p2.last_name
+             matches.p1Name, 
+             matches.p2Name
           ) AS winner, MatchWinner
     FROM points
     JOIN matches ON matches.match = points.match

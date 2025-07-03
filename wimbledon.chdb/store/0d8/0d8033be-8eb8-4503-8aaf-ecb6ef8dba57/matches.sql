@@ -1,7 +1,9 @@
-ATTACH TABLE _ UUID '2a0048c3-4b02-4448-a5b5-01eea6ef6a9d'
+ATTACH TABLE _ UUID 'fc0ed7de-3958-47a0-a6b9-3160fcc0992c'
 (
-    `json` JSON,
-    `match` String
+    `p1Name` Nullable(String),
+    `p2Name` Nullable(String),
+    `match` String,
+    `event` String
 )
 ENGINE = MergeTree
 ORDER BY match
