@@ -53,11 +53,12 @@ WITH
   pointsToWinMatch(
     matches.event = 'Men', MatchWinner, GameWinner, SetWinner, '2', p2.setsWon, p1.setsWon, p2.gamesWon, p1.gamesWon, p2.score, p1.score
   ) AS p2PointsToWin
-select p1Name, p1PointsToWin, p2PointsToWin, p2Name,
+select PointNumber, p1Name, p1PointsToWin, p2PointsToWin, p2Name,
       p1.setsWon || '-' || p2.setsWon || ' ' || p1.gamesWon || '-' || p2.gamesWon || ' (' || p1.score || '-' || p2.score || ')'  AS score
 FROM points
 JOIN matches ON matches.match = points.match
-WHERE match = '{selected_match_id}';
+WHERE match = '{selected_match_id}'
+ORDER BY PointNumber
 """, "DataFrame")
 
 
@@ -82,15 +83,12 @@ with left:
     st.write("🥇 " + df.winner.iloc[0])
     st.write("🆚 " + score )
     st.write(f"⏰ {df["ElapsedTime"].iloc[0]}")
-    st.write("🎾 " + df["PointNumber"].iloc[0] + " total points")
+    st.write("🎾 " + str(df["PointNumber"].iloc[0]) + " total points")
     st.write("⚠️ " + (str(points_df.p2PointsToWin.min()) if winner_id == '1' else str(points_df.p1PointsToWin.min())) + " points from losing")
 
 with right:
   with st.spinner("Loading...", show_time=True):
-    points_df = points_df.reset_index()
-    points_df.rename(columns={'index': 'Step'}, inplace=True)
-
-    df_long = points_df.melt(id_vars=['Step', 'score'], 
+    df_long = points_df.melt(id_vars=['PointNumber', 'score'], 
                       value_vars=['p1PointsToWin', 'p2PointsToWin'],
                       var_name='PlayerType', 
                       value_name='PointsToWin')
@@ -104,15 +102,15 @@ with right:
     fig = px.line(
         df_long,
         color_discrete_sequence=["white", "#faff69"],
-        x='Step',
+        x='PointNumber',
         y='PointsToWin',
         color='Player',
         markers=False,
         title='Points needed to win the match',
-        labels={'Step': 'Point Step', 'PointsToWin': 'Points to Win'},
+        labels={'PointNumber': 'Point Step', 'PointsToWin': 'Points to Win'},
           hover_data={
             'score': True,
-            'Step': False,
+            'PointNumber': False,
             'PointsToWin': True,
             'Player': True
         },
