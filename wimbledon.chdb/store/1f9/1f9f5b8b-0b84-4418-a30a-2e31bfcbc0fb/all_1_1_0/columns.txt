@@ -1,0 +1,6 @@
+columns format version: 1
+4 columns:
+`p1Name` Nullable(String)
+`p2Name` Nullable(String)
+`match` String
+`event` String
