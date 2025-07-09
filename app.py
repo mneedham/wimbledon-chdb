@@ -12,18 +12,37 @@ sess = chs.Session("wimbledon.chdb")
 
 with st.sidebar:
   st.write("Choose a match")
-  gender_filter = st.selectbox(
-      "Matches to include",
-      options=["Both", "Men", "Women"]
+  events = sess.query("""
+  select DISTINCT eventName::String AS eventName
+  FROM matches
+  """, "DataFrame")
+
+  event_filter = st.selectbox(
+      "Event",
+      options=["All"] + events.eventName.values.tolist()
+  )
+
+  rounds = sess.query("""
+  select DISTINCT roundName::String AS roundName
+  FROM matches
+  """, "DataFrame")
+
+  round_filter = st.selectbox(
+      "Round",
+      options=["All"] + rounds.roundName.values.tolist()
   )
   match = sess.query("""
-  select match, p1Name, p2Name, event
+  select match, p1Name, p2Name, eventName::String AS eventName, roundName::String AS roundName
   FROM matches
-  ORDER BY event
+  ORDER BY eventName
   """, "DataFrame")
-  if gender_filter != "Both":
-    match = match[match["event"] == gender_filter]
-    
+
+  if event_filter != "All":
+    match = match[match["eventName"] == event_filter]
+
+  if round_filter != "All":
+    match = match[match["roundName"] == round_filter]
+
   match['label'] = match['p1Name'] + " vs " + match['p2Name']
   label_to_match = dict(zip(match['label'], match['match']))
 
@@ -36,12 +55,14 @@ with st.sidebar:
   st.write("----")
   st.write("Powered by [chDB](https://clickhouse.com/docs/chdb) and [Streamlit](https://streamlit.io/).")
 
+st.write(selected_match_id)
 df = sess.query(f"""
 SELECT p1.gamesWon || '-' || p2.gamesWon AS score, p1Name, p2Name
 FROM points
 JOIN matches ON matches.match = points.match
 WHERE match = '{selected_match_id}' AND (SetWinner <> '0' OR MatchWinner <> '0')
 """, "DataFrame")
+st.write(df)
 
 st.header(f"{df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
 
