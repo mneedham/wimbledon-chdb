@@ -1,0 +1,10 @@
+columns format version: 1
+8 columns:
+`p1Name` Nullable(String)
+`p2Name` Nullable(String)
+`match` String
+`event` String
+`roundName` Dynamic
+`eventName` Dynamic
+`courtName` Dynamic
+`roundNameShort` Dynamic

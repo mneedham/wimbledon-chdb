@@ -1,0 +1,30 @@
+ATTACH TABLE _ UUID '7778d323-e737-4286-af83-7e6a18a263ab'
+(
+    `tourney_id` String,
+    `tourney_name` String,
+    `surface` String,
+    `draw_size` UInt32,
+    `tourney_level` String,
+    `tourney_date` String,
+    `match_num` UInt32,
+    `winner_id` UInt32,
+    `winner_name` String,
+    `loser_id` UInt32,
+    `loser_name` String,
+    `score` String,
+    `round` String,
+    `minutes` UInt32,
+    `w_ace` UInt32,
+    `w_df` UInt32,
+    `w_svpt` UInt32,
+    `w_1stIn` UInt32,
+    `w_1stWon` UInt32,
+    `w_2ndWon` UInt32,
+    `l_ace` UInt32,
+    `l_df` UInt32,
+    `l_svpt` UInt32,
+    `l_1stIn` UInt32,
+    `l_1stWon` UInt32,
+    `l_2ndWon` UInt32
+)
+ENGINE = Memory
