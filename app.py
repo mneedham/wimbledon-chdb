@@ -55,14 +55,13 @@ with st.sidebar:
   st.write("----")
   st.write("Powered by [chDB](https://clickhouse.com/docs/chdb) and [Streamlit](https://streamlit.io/).")
 
-st.write(selected_match_id)
+
 df = sess.query(f"""
 SELECT p1.gamesWon || '-' || p2.gamesWon AS score, p1Name, p2Name
 FROM points
 JOIN matches ON matches.match = points.match
 WHERE match = '{selected_match_id}' AND (SetWinner <> '0' OR MatchWinner <> '0')
 """, "DataFrame")
-st.write(df)
 
 st.header(f"{df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
 
