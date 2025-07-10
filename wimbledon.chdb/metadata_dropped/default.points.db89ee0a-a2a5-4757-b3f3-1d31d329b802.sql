@@ -1,4 +1,4 @@
-ATTACH TABLE _ UUID '2f57dbd9-f5f3-4835-97df-2d3119c6b6a6'
+ATTACH TABLE _ UUID 'db89ee0a-a2a5-4757-b3f3-1d31d329b802'
 (
     `MatchWinner` String,
     `SetWinner` String,
