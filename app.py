@@ -92,9 +92,9 @@ with st.sidebar:
           on_change=on_select_change
       )
 
-  # Always update based on current selection
-  selected_match_id = label_to_match[selected_label]
-  st.write(selected_label, selected_match_id)
+    # Always update based on current selection
+      selected_match_id = label_to_match[selected_label]
+      
   if selected_match_id != st.session_state.match_id:
       st.session_state.match_id = selected_match_id
       st.query_params.match_id = selected_match_id
