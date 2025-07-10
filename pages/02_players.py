@@ -5,6 +5,7 @@ st.set_page_config(layout="wide")
 
 import plotly.express as px
 import pandas as pd
+import numpy as np
 
 sess = chs.Session("wimbledon.chdb")
 
@@ -47,6 +48,8 @@ with st.sidebar:
   st.write("Powered by [chDB](https://clickhouse.com/docs/chdb) and [Streamlit](https://streamlit.io/).")
 
 st.header(st.session_state.player_id)
+
+use_linear_scale = st.checkbox("Use linear scale", key="scale_players")
 
 matches_df = sess.query(f"""
 SELECT match
@@ -125,6 +128,7 @@ for match in matches_df.match.values.tolist():
                         value_vars=['p1PointsToWin', 'p2PointsToWin'],
                         var_name='PlayerType', 
                         value_name='PointsToWin')
+      df_long['PointsToWin_sqrt'] = np.sqrt(df_long['PointsToWin'])
 
       player_name_map = {
           'p1PointsToWin': points_df['p1Name'].iloc[0],
@@ -136,22 +140,28 @@ for match in matches_df.match.values.tolist():
           df_long,
           color_discrete_sequence=["white", "#faff69"],
           x='PointNumber',
-          y='PointsToWin',
+          y='PointsToWin' if use_linear_scale else 'PointsToWin_sqrt',
           color='Player',
           markers=False,
           title='Points needed to win the match',
-          labels={'PointNumber': 'Point Step', 'PointsToWin': 'Points to Win'},
+          labels={'PointNumber': 'Point Step', 'PointsToWin_sqrt': 'Points to Win', 'PointsToWin': 'Points to Win'},
             hover_data={
               'score': True,
               'PointNumber': False,
+              'PointsToWin_sqrt': False,
               'PointsToWin': True,
               'Player': True
           },
           template='plotly_dark'
       )
 
+      y_axis_config = {'autorange': 'reversed'}
+      if not use_linear_scale:
+          y_axis_config['tickvals'] = np.sqrt([1, 5, 10, 25, 50, 100])
+          y_axis_config['ticktext'] = ['1', '5', '10', '25', '50', '100']
+
       fig.update_layout(
-          yaxis=dict(autorange='reversed'),
+          yaxis=y_axis_config,
           hovermode='x unified',
           margin=dict(l=40, r=40, t=40, b=80),
           legend=dict(
