@@ -189,13 +189,17 @@ with right:
 
     fig.update_layout(
         yaxis=dict(autorange='reversed'),
-        hovermode='x unified'
+        hovermode='x unified',
+        margin=dict(l=40, r=40, t=40, b=80),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.2,
+            xanchor="center",
+            x=0.5
+        )
     )
 
-    fig.update_layout(
-        margin=dict(l=40, r=40, t=25, b=40)  # left, right, top, bottom
-    )
-
-    fig.update_traces(line=dict(width=2))  # thicker lines for visibility
+    fig.update_traces(line=dict(width=2))  
 
     st.plotly_chart(fig, use_container_width=True)

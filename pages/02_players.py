@@ -63,7 +63,10 @@ for match in matches_df.match.values.tolist():
   WHERE match = '{match}' AND (SetWinner <> '0' OR MatchWinner <> '0')
   """, "DataFrame")
 
-  st.write(f"### {df.roundName.iloc[0]}: {df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
+
+  st.write(f"""
+  <p style="margin-bottom: 0;"><i>{df.roundName.iloc[0]}</i></p><h3 style="padding-top:0;">{df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}</h3>
+  """, unsafe_allow_html=True)
 
   points_df = sess.query(f"""
   WITH
@@ -150,16 +153,16 @@ for match in matches_df.match.values.tolist():
       fig.update_layout(
           yaxis=dict(autorange='reversed'),
           hovermode='x unified',
-          margin=dict(l=40, r=40, t=80, b=40),
+          margin=dict(l=40, r=40, t=40, b=80),
           legend=dict(
               orientation="h",
-              yanchor="bottom",
-              y=1.02,
-              xanchor="right",
-              x=1
+              yanchor="top",
+              y=-0.2,
+              xanchor="center",
+              x=0.5
           )
       )
 
-      fig.update_traces(line=dict(width=2))  # thicker lines for visibility
+      fig.update_traces(line=dict(width=2))  
 
       st.plotly_chart(fig, use_container_width=True)
