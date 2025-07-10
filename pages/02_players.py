@@ -9,11 +9,11 @@ import pandas as pd
 sess = chs.Session("wimbledon.chdb")
 
 if "player_id" in st.query_params:
-  st.session_state.match_id = st.query_params.player_id
+  st.session_state.player_id = st.query_params.player_id
 
 with st.sidebar:
   st.write("Choose a player")
-  players = sess.query("""
+  players_df = sess.query("""
   select DISTINCT player
   FROM (
   SELECT p1Name AS player FROM matches
@@ -22,24 +22,36 @@ with st.sidebar:
     )
     ORDER BY player
   """, "DataFrame")
+  players = players_df['player'].tolist()
+
+  if "player_id" not in st.session_state:
+    st.session_state.player_id = players[0]
+
+  def on_select_change():
+      st.session_state.player_id = st.session_state.selected_player
+      st.query_params.player_id = st.session_state.selected_player
+
+  if st.session_state.player_id not in players:
+      st.session_state.player_id = players[0]
+      st.query_params.player_id = players[0]
 
   selected_label = st.selectbox(
       "Select player",
       options=players,
-      # index=players.index(st.session_state.selected_label),
-      key="selected_label",
-      # on_change=on_select_change
+      index=players.index(st.session_state.player_id),
+      key="selected_player",
+      on_change=on_select_change
   )
 
   st.write("----")
   st.write("Powered by [chDB](https://clickhouse.com/docs/chdb) and [Streamlit](https://streamlit.io/).")
 
-st.header(selected_label)
+st.header(st.session_state.player_id)
 
 matches_df = sess.query(f"""
 SELECT match
 FROM matches
-WHERE p1Name = '{selected_label}' OR p2Name = '{selected_label}'
+WHERE p1Name = '{st.session_state.player_id}' OR p2Name = '{st.session_state.player_id}'
 """, "DataFrame")
 
 

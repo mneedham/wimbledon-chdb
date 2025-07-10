@@ -71,12 +71,11 @@ with st.sidebar:
   else:
       default_label = players[0] if players else ""
 
-  st.session_state.selected_label = default_label
   if players:
       selected_label = st.selectbox(
           "Select match",
           options=players,
-          index=players.index(st.session_state.selected_label),
+          index=players.index(default_label),
           key="selected_label",
           on_change=on_select_change
       )
