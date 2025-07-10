@@ -45,13 +45,13 @@ WHERE p1Name = '{selected_label}' OR p2Name = '{selected_label}'
 
 for match in matches_df.match.values.tolist():
   df = sess.query(f"""
-  SELECT p1.gamesWon || '-' || p2.gamesWon AS score, p1Name, p2Name
+  SELECT p1.gamesWon || '-' || p2.gamesWon AS score, p1Name, p2Name, roundName::String AS roundName
   FROM points
   JOIN matches ON matches.match = points.match
   WHERE match = '{match}' AND (SetWinner <> '0' OR MatchWinner <> '0')
   """, "DataFrame")
 
-  st.write(f"### {df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
+  st.write(f"### {df.roundName.iloc[0]}: {df.p1Name.iloc[0]} vs {df.p2Name.iloc[0]}")
 
   points_df = sess.query(f"""
   WITH
