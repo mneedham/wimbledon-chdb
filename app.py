@@ -10,6 +10,9 @@ st.title("Points needed to win matches at Wimbledon 2025")
 sess = chs.Session("wimbledon.chdb")
 
 
+if "match_id" in st.query_params:
+  st.session_state.match_id = st.query_params.match_id
+
 with st.sidebar:
   st.write("Choose a match")
   events = sess.query("""
@@ -37,6 +40,10 @@ with st.sidebar:
   ORDER BY eventName
   """, "DataFrame")
 
+  if "match_id" not in st.session_state:
+    st.session_state.match_id = match.match.iloc[0]
+
+
   if event_filter != "All":
     match = match[match["eventName"] == event_filter]
 
@@ -45,12 +52,52 @@ with st.sidebar:
 
   match['label'] = match['p1Name'] + " vs " + match['p2Name']
   label_to_match = dict(zip(match['label'], match['match']))
+  match_to_label = dict(zip(match['match'], match['label']))
+  
+  if st.session_state.match_id not in match_to_label:
+    st.query_params.match_id = match.match.iloc[0]
+    st.session_state.match_id = match.match.iloc[0]
 
-  selected_label = st.selectbox(
-      "Select match",
-      options=list(label_to_match.keys())
-  )
+  # Get the current list of players based on filters
+  players = list(label_to_match.keys())
+
+  # Define a callback function to handle selection changes
+  def on_select_change():
+      selected_match_id = label_to_match[st.session_state.selected_label]
+      st.session_state.match_id = selected_match_id
+      st.query_params.match_id = selected_match_id
+
+  # Find which label corresponds to the current match_id
+  current_match_id = st.session_state.match_id
+  if current_match_id in match_to_label:
+      default_label = match_to_label[current_match_id]
+      # Check if the default label is still in the filtered list
+      if default_label not in players:
+          # If not, reset to the first option in the filtered list
+          default_label = players[0] if players else ""
+  else:
+      # Fallback to first option if match_id not found
+      default_label = players[0] if players else ""
+
+  # Update the selected_label in session_state to ensure it's valid
+  st.session_state.selected_label = default_label
+
+  # Use the selectbox with the on_change parameter
+  if players:  # Only show the selectbox if there are options
+      selected_label = st.selectbox(
+          "Select match",
+          options=players,
+          index=players.index(st.session_state.selected_label),
+          key="selected_label",
+          on_change=on_select_change
+      )
+
+  # Always update based on current selection
   selected_match_id = label_to_match[selected_label]
+  st.write(selected_label, selected_match_id)
+  if selected_match_id != st.session_state.match_id:
+      st.session_state.match_id = selected_match_id
+      st.query_params.match_id = selected_match_id
 
   st.write("----")
   st.write("Powered by [chDB](https://clickhouse.com/docs/chdb) and [Streamlit](https://streamlit.io/).")
